@@ -9,8 +9,9 @@ const onFormSubmit = (e) => {
   const targetDate = itemResponses[1].getResponse();
   const column = itemResponses[2].getResponse();
   const amount = itemResponses[3].getResponse();
+  let uploadFileId;
   if (itemResponses[4]) {
-    const uploadFileId = itemResponses[4].getResponse();
+    uploadFileId = itemResponses[4].getResponse();
     // targetDateから年と月を取得する
     const date = targetDate.split("-");
     const targetDateFolderName = date[0] + "/" + ("0" + date[1]).slice(-2);
@@ -23,4 +24,44 @@ const onFormSubmit = (e) => {
     targetDateFolder.addFile(targetFile);
     targetFile.getParents().next().removeFile(targetFile);
   }
+
+  // Slackへ通知
+  const conditions = {
+    text:
+      `${byName}さんから会計が登録されました\n日付:${targetDate}\n項目:${column}\n金額:${amount}`,
+    title: "会計通知"
+  };
+  sendSlack(conditions);
+}
+
+
+const sendSlack = (conditions) => {
+  const url = PropertiesService.getScriptProperties().getProperty(
+    "WEB_HOOK_URL"
+  );
+  const channel = PropertiesService.getScriptProperties().getProperty(
+    "SLACK_CHANNEL"
+  );
+  const user = PropertiesService.getScriptProperties().getProperty(
+    "SLACK_USER"
+  );
+  const data = {
+    attachments: [
+      {
+        color: "#d23546",
+        text: conditions.text,
+        title: conditions.title
+      }
+    ],
+    channel: channel,
+    username: user
+  };
+  const payload = JSON.stringify(data);
+  const options = {
+    contentType: "application/json",
+    method: "post",
+    payload
+  };
+
+  UrlFetchApp.fetch(url, options);
 }
