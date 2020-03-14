@@ -9,9 +9,10 @@ const onFormSubmit = (e) => {
   const targetDate = itemResponses[1].getResponse();
   const column = itemResponses[2].getResponse();
   const amount = itemResponses[3].getResponse();
+  const memo = itemResponses[4].getResponse();
   let uploadFileId;
-  if (itemResponses[4]) {
-    uploadFileId = itemResponses[4].getResponse();
+  if (itemResponses[5]) {
+    uploadFileId = itemResponses[5].getResponse();
     // targetDateから年と月を取得する
     const date = targetDate.split("-");
     const targetDateFolderName = date[0] + "/" + ("0" + date[1]).slice(-2);
@@ -28,7 +29,7 @@ const onFormSubmit = (e) => {
   // Slackへ通知
   const conditions = {
     text:
-      `${byName}さんから会計が登録されました\n日付:${targetDate}\n項目:${column}\n金額:${amount}`,
+      `${byName}さんから会計が登録されました\n日付:${targetDate}\n項目:${column}\n金額:${amount}\n備考:${memo}`,
     title: "会計通知"
   };
   sendSlack(conditions);
